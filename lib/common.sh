@@ -31,7 +31,8 @@ achievement() {
 assert_json() {
   local file=$1
   if test -f $file; then
-    if ! cat $file | $bp_dir/vendor/jq '.' > /dev/null; then
+    if ! node -e "JSON.parse(require('fs')
+      .readFileSync(process.argv[1])));" $file 2>/dev/null; then
       error "Unable to parse $file as JSON"
     fi
   fi
@@ -49,7 +50,8 @@ read_json() {
   local file=$1
   local node=$2
   if test -f $file; then
-    cat $file | $bp_dir/vendor/jq --raw-output "$node // \"\"" || return 1
+    node -e "console.log(JSON.parse(
+      require('fs').readFileSync(process.argv[2]))$node);" $file 2>/dev/null
   else
     echo ""
   fi
